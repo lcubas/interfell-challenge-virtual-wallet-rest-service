@@ -1,1 +1,6 @@
-export class Customer {}
+export class Customer {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  documentNumber: string;
+}

@@ -1,14 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateCustomerDto } from './dto/create-customer.dto';
 import { Client } from 'nestjs-soap';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { CUSTOMER_SOAP_CLIENT_NAME } from 'src/constants';
 
 @Injectable()
 export class CustomerService {
   constructor(
-    @Inject('CUSTOMER_SOAP_CLIENT') private readonly mySoapClient: Client,
+    @Inject(CUSTOMER_SOAP_CLIENT_NAME) private readonly soapClient: Client,
   ) {}
 
-  async create(createCustomerDto: CreateCustomerDto) {
-    await this.mySoapClient.registerCustomer(createCustomerDto);
+  /**
+   * Create a new customer by forwarding the request to the SOAP service.
+   * Uses the SOAP client's `registerCustomer` but asynchronously, adding "Async" to the final method name.
+   * For more details, refer to the documentation: https://www.npmjs.com/package/soap#clientmethodasyncargs-options---call-method-on-the-soap-service
+   *
+   */
+  async create(customerDto: CreateCustomerDto) {
+    const [response] = await this.soapClient.registerCustomerAsync(customerDto);
+    return response;
   }
 }

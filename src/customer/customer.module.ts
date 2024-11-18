@@ -3,11 +3,14 @@ import { CustomerService } from './customer.service';
 import { CustomerController } from './customer.controller';
 import { CustomerSoapConfigService } from './customer-soap-config.service';
 import { SoapModule } from 'nestjs-soap';
+import { ConfigModule } from '@nestjs/config';
+import { CUSTOMER_SOAP_CLIENT_NAME } from 'src/constants';
 
 @Module({
   imports: [
     SoapModule.forRootAsync({
-      clientName: 'CUSTOMER_SOAP_CLIENT',
+      imports: [ConfigModule],
+      clientName: CUSTOMER_SOAP_CLIENT_NAME,
       useClass: CustomerSoapConfigService,
     }),
   ],

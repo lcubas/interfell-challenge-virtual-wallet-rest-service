@@ -1,14 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateWalletDto } from './dto/create-wallet.dto';
 import { Client } from 'nestjs-soap';
+import { CreateWalletDto } from './dto/create-wallet.dto';
+import { WALLET_SOAP_CLIENT_NAME } from 'src/constants';
 
 @Injectable()
 export class WalletService {
   constructor(
-    @Inject('CUSTOMER_SOAP_CLIENT') private readonly mySoapClient: Client,
+    @Inject(WALLET_SOAP_CLIENT_NAME) private readonly soapClient: Client,
   ) {}
 
   create(createWalletDto: CreateWalletDto) {
+    console.log('createWalletDto', createWalletDto);
     return 'This action adds a new wallet';
   }
 
