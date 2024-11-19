@@ -1,22 +1,17 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
-import {
-  // UnprocessableEntityException,
-  // ValidationPipe,
-  VersioningType,
-} from '@nestjs/common';
 import { ResponseInterceptor } from './interceptors/response/response.interceptor';
 import { ErrorCatchFilter } from './filters/error-catch/error-catch.filter';
-import { ValidateDtoPipe } from './pipes/validation-dto.pipe';
+import { ValidationPipeFailedException } from './exceptions/validation-pipe-failed.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     exceptionFactory: (errors) => new UnprocessableEntityException(errors),
-  //   }),
-  // );
-  app.useGlobalPipes(new ValidateDtoPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => new ValidationPipeFailedException(errors),
+    }),
+  );
   app.useGlobalInterceptors(new ResponseInterceptor());
 
   const httpAdapterHost = app.get(HttpAdapterHost);

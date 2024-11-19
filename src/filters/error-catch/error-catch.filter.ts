@@ -6,12 +6,17 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import {
+  ErrorValidation,
+  ValidationPipeFailedException,
+} from 'src/exceptions/validation-pipe-failed.exception';
 
 interface ApiErrorResponse {
   code: number;
   success: boolean;
   message: string;
-  error?: Record<string, unknown>;
+  stack?: string;
+  errors?: ErrorValidation[];
 }
 
 @Catch()
@@ -34,20 +39,18 @@ export class ErrorCatchFilter implements ExceptionFilter {
       code,
       success: false,
       message: 'Internal Server Error',
-      error: {
-        timestamp: new Date().toISOString(),
-        path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      },
     };
-
-    console.error(exception);
 
     if (exception instanceof Error) {
       responseBody.message = exception.message;
     }
 
+    if (exception instanceof ValidationPipeFailedException) {
+      responseBody.errors = exception.errors;
+    }
+
     if (process.env.NODE_ENV === 'development' && exception instanceof Error) {
-      responseBody.error.stack = exception.stack ?? null;
+      responseBody.stack = exception.stack ?? null;
     }
 
     httpAdapter.reply(ctx.getResponse(), responseBody, code);
